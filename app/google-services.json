@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441795374805",
+    "project_id": "taskforfriends-6d4b1",
+    "storage_bucket": "taskforfriends-6d4b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441795374805:android:30b7bbad2feff8a201fc5c",
+        "android_client_info": {
+          "package_name": "com.example.taskforfriends"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAodZ1gqD_fpwCXRXTSuU-4976eIcBrj0Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
