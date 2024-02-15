@@ -6,14 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.taskforfriends.Models.User;
 import com.example.taskforfriends.R;
 import com.example.taskforfriends.databinding.FragmentFriendsBinding;
 import com.google.firebase.database.DataSnapshot;

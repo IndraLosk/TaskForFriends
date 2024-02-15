@@ -10,47 +10,42 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.taskforfriends.Models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.taskforfriends.databinding.ActivityStartBinding;
+import com.example.taskforfriends.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.SignInMethodQueryResult;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.List;
 import java.util.UUID;
 
 public class Start extends AppCompatActivity {
+    private ActivityStartBinding binding;
 
     Button btnSignIn, btnRegister;
     FirebaseAuth auth;
     FirebaseDatabase db;
     DatabaseReference users;
-    ConstraintLayout root;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        binding = ActivityStartBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        btnSignIn = findViewById(R.id.btnSignIn);
-        btnRegister = findViewById(R.id.btnRegister);
-        root = findViewById(R.id.root_element);
+        btnSignIn = binding.btnSignIn;
+        btnRegister = binding.btnRegister;
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
@@ -93,14 +88,14 @@ public class Start extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(TextUtils.isEmpty(email.getText().toString())){
                     //Toast.makeText(getApplicationContext(), "!", Toast.LENGTH_SHORT).show();
-                    Snackbar.make(root, "Почта введена неверно", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.getRoot(), "Почта введена неверно", Snackbar.LENGTH_SHORT).show();
                     showSignInWindow();
                     return;
                 }
 
                 if(password.getText().toString().length() < 8){
                     //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                    Snackbar.make(root, "Введен неверный пароль", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.getRoot(), "Введен неверный пароль", Snackbar.LENGTH_SHORT).show();
                     showSignInWindow();
                     return;
                 }
@@ -149,23 +144,23 @@ public class Start extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (TextUtils.isEmpty(email.getText().toString())) {
-                    Snackbar.make(root, "Введите почту", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.getRoot(), "Введите почту", Snackbar.LENGTH_SHORT).show();
                     showRegisterWindow();
                     return;
                 }
                 if (TextUtils.isEmpty(name.getText().toString())) {
-                    Snackbar.make(root, "Введите имя", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.getRoot(), "Введите имя", Snackbar.LENGTH_SHORT).show();
                     showRegisterWindow();
                     return;
                 }
                 if (password.getText().toString().length() < 8) {
                     //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                    Snackbar.make(root, "Введите пароль длинее 8 символов", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.getRoot(), "Введите пароль длинее 8 символов", Snackbar.LENGTH_SHORT).show();
                     showRegisterWindow();
                     return;
                 }
 
-                //Регестрация пользователя
+                //Регистрация пользователя
                 auth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
@@ -188,7 +183,7 @@ public class Start extends AppCompatActivity {
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Snackbar.make(root, "Ошибка регестрации", Snackbar.LENGTH_SHORT).show();
+                                                Snackbar.make(binding.getRoot(), "Ошибка регестрации", Snackbar.LENGTH_SHORT).show();
                                             }
                                         });
                             }
