@@ -1,6 +1,11 @@
 package com.example.taskforfriends.ui.dashboard;
 
+import static androidx.fragment.app.FragmentManager.TAG;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,13 +86,18 @@ public class FriendsFragment extends Fragment {
                     // Добавляем имя пользователя в список
                     userList.add(userName);
                 }
-                // Получаем адаптер от RecyclerView
-                
+
+                String[] dataArray = userList.toArray(new String[userList.size()]); // преобразование List в массив
+                Context context = getContext(); // для фрагмента, или this для активити
+                // Создаем новый экземпляр адаптера и устанавливаем его для RecyclerView
+                RecyclerViewAdapter adapter = new RecyclerViewAdapter(context, dataArray);
                 }
 
+            @SuppressLint("RestrictedApi")
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Обработка ошибок, если они возникнут
+                Log.e(TAG, "Ошибка при получении результатов поиска", databaseError.toException());
             }
         });
     }
