@@ -118,6 +118,23 @@ public class Start extends AppCompatActivity {
 
         AlertDialog builder = dialog.create();
         builder.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+
+        // Установка цвета для кнопок
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(Color.BLACK);
+                }
+
+                Button negativeButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(Color.BLACK);
+                }
+            }
+        });
+
         builder.show();
 
     }
@@ -194,6 +211,23 @@ public class Start extends AppCompatActivity {
 
         AlertDialog builder = dialog.create();
         builder.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+
+        // Установка цвета для кнопок
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(Color.BLACK);
+                }
+
+                Button negativeButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(Color.BLACK);
+                }
+            }
+        });
+
 
         builder.show();
     }
