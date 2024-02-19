@@ -11,14 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.taskforfriends.Models.User;
 import com.example.taskforfriends.R;
 import com.example.taskforfriends.databinding.FragmentFriendsBinding;
 import com.google.firebase.database.DataSnapshot;
@@ -48,9 +46,7 @@ public class FriendsFragment extends Fragment {
                 new ViewModelProvider(this).get(FriendsViewModel.class);
 
         binding = FragmentFriendsBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        View view = inflater.inflate(R.layout.fragment_friends, container, false);
+        View view = binding.getRoot();
 
         // Получаем ссылку на базу данных Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -61,15 +57,12 @@ public class FriendsFragment extends Fragment {
         usersRecyclerView = view.findViewById(R.id.usersRecyclerView);
 
         // Устанавливаем обработчик клика на кнопку поиска
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String searchQuery = searchEditText.getText().toString().trim();
-                searchUsers(searchQuery);
-            }
+        searchButton.setOnClickListener(v -> {
+            String searchQuery = searchEditText.getText().toString().trim();
+            searchUsers(searchQuery);
         });
 
-        return root;
+        return view;
     }
 
     private void searchUsers(String searchQuery) {
@@ -77,7 +70,7 @@ public class FriendsFragment extends Fragment {
 
         searchUsersQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Обработка результатов поиска и отображение пользователей в RecyclerView
                 List<String> userList = new ArrayList<>(); // Создаем список для хранения данных о пользователях
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
@@ -95,7 +88,7 @@ public class FriendsFragment extends Fragment {
 
             @SuppressLint("RestrictedApi")
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Обработка ошибок, если они возникнут
                 Log.e(TAG, "Ошибка при получении результатов поиска", databaseError.toException());
             }

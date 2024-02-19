@@ -1,4 +1,4 @@
-package com.example.taskforfriends.Models;
+package com.example.taskforfriends.models;
 
 public class User {
     private String uid, name, email, password;
