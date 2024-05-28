@@ -1,9 +1,14 @@
 package com.example.taskforfriends;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -13,40 +18,62 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.example.taskforfriends.databinding.ActivityStartBinding;
+
 import com.example.taskforfriends.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import java.util.Objects;
-import java.util.UUID;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Start extends AppCompatActivity {
-    private ActivityStartBinding binding;
 
     Button btnSignIn, btnRegister;
     FirebaseAuth auth;
     FirebaseDatabase db;
     DatabaseReference users;
+    ConstraintLayout root;
 
+    private List<String> emailList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityStartBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_start);
 
-        btnSignIn = binding.btnSignIn;
-        btnRegister = binding.btnRegister;
+        btnSignIn = findViewById(R.id.btnSignIn);
+        btnRegister = findViewById(R.id.btnRegister);
+        root = findViewById(R.id.root_element);
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
         users = db.getReference("Users");
 
-        btnRegister.setOnClickListener(w -> showRegisterWindow());
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String savedEmail = prefs.getString("Email", "0");
+        if(!savedEmail.equals("0")){
+            startActivity(new Intent(Start.this, MainActivity.class));
+            finish();
+        }
 
-        btnSignIn.setOnClickListener(w -> showSignInWindow());
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View w){
+                showRegisterWindow();
+            }
+        });
+
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View w){
+                showSignInWindow();
+            }
+        });
     }
 
     private void showSignInWindow() {
@@ -59,43 +86,66 @@ public class Start extends AppCompatActivity {
         final EditText email = signInWindow.findViewById(R.id.emailField);
         final EditText password = signInWindow.findViewById(R.id.passField);
 
-        dialog.setNegativeButton("Отмена", (dialogInterface, i) -> dialogInterface.dismiss());
-
-        dialog.setPositiveButton("Войти", (dialogInterface, i) -> {
-            if(TextUtils.isEmpty(email.getText().toString())){
-                //Toast.makeText(getApplicationContext(), "!", Toast.LENGTH_SHORT).show();
-                Snackbar.make(binding.getRoot(), "Почта введена неверно", Snackbar.LENGTH_SHORT).show();
-                showSignInWindow();
-                return;
+        dialog.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
             }
+        });
 
-            if(password.getText().toString().length() < 8){
-                //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                Snackbar.make(binding.getRoot(), "Введен неверный пароль", Snackbar.LENGTH_SHORT).show();
-                showSignInWindow();
-                return;
+        dialog.setPositiveButton("Войти", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(TextUtils.isEmpty(email.getText().toString())){
+                    //Toast.makeText(getApplicationContext(), "!", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(root, "Почта введена неверно", Snackbar.LENGTH_SHORT).show();
+                    showSignInWindow();
+                    return;
+                }
+
+                if(password.getText().toString().length() < 8){
+                    //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(root, "Введен неверный пароль", Snackbar.LENGTH_SHORT).show();
+                    showSignInWindow();
+                    return;
+                }
+
+                auth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                            @Override
+                            public void onSuccess(AuthResult authResult) {
+                                SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("Email", email.getText().toString());
+                                editor.apply();
+                                startActivity(new Intent(Start.this, MainActivity.class));
+                                finish();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getApplicationContext(), "Ошибка входа, проверьте введеную почту или пароль!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
-
-            auth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                    .addOnSuccessListener(authResult -> {
-                        startActivity(new Intent(Start.this, MainActivity.class));
-                        finish();
-                    }).addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "Ошибка входа, проверьте введеную почту или пароль!", Toast.LENGTH_SHORT).show());
         });
 
         AlertDialog builder = dialog.create();
         builder.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
         // Установка цвета для кнопок
-        builder.setOnShowListener(dialogInterface -> {
-            Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setTextColor(Color.BLACK);
-            }
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(Color.BLACK);
+                }
 
-            Button negativeButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
-            if (negativeButton != null) {
-                negativeButton.setTextColor(Color.BLACK);
+                Button negativeButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(Color.BLACK);
+                }
             }
         });
 
@@ -114,59 +164,92 @@ public class Start extends AppCompatActivity {
         final EditText password = registerWindow.findViewById(R.id.passField);
         final EditText name = registerWindow.findViewById(R.id.nameField);
 
-        dialog.setNegativeButton("Отмена", (dialogInterface, i) -> dialogInterface.dismiss());
-
-        dialog.setPositiveButton("Готово", (dialogInterface, i) -> {
-            if (TextUtils.isEmpty(email.getText().toString())) {
-                Snackbar.make(binding.getRoot(), "Введите почту", Snackbar.LENGTH_SHORT).show();
-                showRegisterWindow();
-                return;
+        dialog.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
             }
-            if (TextUtils.isEmpty(name.getText().toString())) {
-                Snackbar.make(binding.getRoot(), "Введите имя", Snackbar.LENGTH_SHORT).show();
-                showRegisterWindow();
-                return;
+        });
+
+        dialog.setPositiveButton("Готово", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Проверка введеных данных
+                if (TextUtils.isEmpty(email.getText().toString())) {
+                    Snackbar.make(root, "Введите почту", Snackbar.LENGTH_SHORT).show();
+                    showRegisterWindow();
+                    return;
+                }
+                for(int j = 0; j < emailList.toArray().length; j++){
+                    if(email == emailList.toArray()[j]){
+                        Snackbar.make(root, "Почта уже занята", Snackbar.LENGTH_SHORT).show();
+                        showRegisterWindow();
+                        return;
+                    }
+                }
+                if (TextUtils.isEmpty(name.getText().toString())) {
+                    Snackbar.make(root, "Введите имя", Snackbar.LENGTH_SHORT).show();
+                    showRegisterWindow();
+                    return;
+                }
+                if (password.getText().toString().length() < 8) {
+                    Snackbar.make(root, "Введите пароль длинее 8 символов", Snackbar.LENGTH_SHORT).show();
+                    showRegisterWindow();
+                    return;
+                }
+
+                //Регестрация пользователя
+                auth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() { //Если все данные введены верно
+                            @Override
+                            public void onSuccess(AuthResult authResult) {
+                                User user = new User(); //Создание экземпляра класса пользователь и заполнение его данными
+                                user.setEmail(email.getText().toString());
+                                user.setName(name.getText().toString());
+                                user.setPassword(password.getText().toString());
+                                user.setScore(0);
+                                user.setNumOfTask("");
+                                user.setFriends("Никого не найдено");
+                                users.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).
+                                        addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                                                SharedPreferences.Editor editor = prefs.edit();
+                                                editor.putString("Email", email.getText().toString()); //сохранение email
+                                                editor.apply();
+
+                                                startActivity(new Intent(Start.this, MainActivity.class));
+                                                finish();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Snackbar.make(root, "Ошибка регестрации", Snackbar.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        });
+
             }
-            if (password.getText().toString().length() < 8) {
-                //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                Snackbar.make(binding.getRoot(), "Введите пароль длинее 8 символов", Snackbar.LENGTH_SHORT).show();
-                showRegisterWindow();
-                return;
-            }
-
-            //Регистрация пользователя
-            auth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                    .addOnSuccessListener(authResult -> {
-                        User user = new User();
-
-                        user.setUid(UUID.randomUUID().toString());
-                        user.setEmail(email.getText().toString());
-                        user.setName(name.getText().toString());
-                        user.setPassword(password.getText().toString());
-                        user.setScore(0);
-
-                        users.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).setValue(user).
-                                addOnSuccessListener(unused -> {
-                                    startActivity(new Intent(Start.this, MainActivity.class));
-                                    finish();
-                                }).addOnFailureListener(e -> Snackbar.make(binding.getRoot(), "Ошибка регистрации", Snackbar.LENGTH_SHORT).show());
-                    });
-
         });
 
         AlertDialog builder = dialog.create();
         builder.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
         // Установка цвета для кнопок
-        builder.setOnShowListener(dialogInterface -> {
-            Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setTextColor(Color.BLACK);
-            }
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
+                if (positiveButton != null) {
+                    positiveButton.setTextColor(Color.BLACK);
+                }
 
-            Button negativeButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
-            if (negativeButton != null) {
-                negativeButton.setTextColor(Color.BLACK);
+                Button negativeButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_NEGATIVE);
+                if (negativeButton != null) {
+                    negativeButton.setTextColor(Color.BLACK);
+                }
             }
         });
 

@@ -1,25 +1,29 @@
 package com.example.taskforfriends.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
-    private String uid, name, email, password;
+    private String name, email, password, friends, numOfTask;
     private int score;
 
     public  User() {}
 
-    public  User(String uid, String name, String email, String password, int score) {
-        this.uid = uid;
+    public String getNumOfTask() {
+        return numOfTask;
+    }
+
+    public void setNumOfTask(String numOfTask) {
+        this.numOfTask = numOfTask;
+    }
+
+    public  User(String name, String email, String password, int score, String friends, String numOfTask) {
         this.score = score;
         this.name = name;
         this.email = email;
         this.password = password;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
+        this.friends = friends;
+        this.numOfTask = numOfTask;
     }
 
     public int getScore() {
@@ -52,5 +56,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFriends() {
+        return friends;
+    }
+
+    public void setFriends(String friends) {
+        this.friends = friends;
     }
 }

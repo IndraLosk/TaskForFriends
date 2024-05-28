@@ -8,24 +8,24 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.taskforfriends.ui.home.HomeFragment"
-        android:label="@string/title_home"
+        android:label="Главная"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.taskforfriends.ui.dashboard.FriendsFragment"
-        android:label="@string/title_dashboard"
+        android:label="Друзья"
         tools:layout="@layout/fragment_friends" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.taskforfriends.ui.notifications.PlansFragment"
-        android:label="@string/title_notifications"
+        android:label="Планы"
         tools:layout="@layout/fragment_plans" />
 
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.taskforfriends.ui.settings.SettingsFragment"
-        android:label="Settings"
+        android:label="Настройки"
         tools:layout="@layout/fragment_settings" />
 </navigation>

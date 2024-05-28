@@ -7,12 +7,12 @@
         android:title="Главная" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_notifications"
         android:icon="@drawable/plan"
         android:title="Планы" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_dashboard"
         android:icon="@drawable/friends"
         android:title="Друзья" />
 
