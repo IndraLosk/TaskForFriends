@@ -47,7 +47,7 @@
 
 
 <div>
-  <img src="https://github.com/IndraLosk/TaskForFriends/blob/master/img%20for%20git/firebase.jpg" width="180" height="400" alt="firebase">
+  <img src="https://github.com/IndraLosk/TaskForFriends/blob/master/img%20for%20git/firebase.jpg" alt="firebase">
 </div>
 
 _____
