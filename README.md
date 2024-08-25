@@ -1,5 +1,4 @@
-<h1>Task for friends</h1>﻿
-_____
+<h1>Task for friends</h1>
 
 <h2>Интерфейс приложения</h2>
 
